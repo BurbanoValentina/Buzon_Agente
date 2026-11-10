@@ -1,0 +1,27 @@
+{
+  "name": "academic-complaints-frontend",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "test": "vitest run",
+    "build": "vite build",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.4.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "jsdom": "^27.1.0",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.8"
+  }
+}
