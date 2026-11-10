@@ -23,3 +23,41 @@ directly.
 - `DELETE /api/v1/admin/session` closes the session.
 - `GET/PATCH /api/v1/admin/account` reads or changes administrator settings.
 
+## Complaints and exports
+
+- `GET /api/v1/admin/complaints` lists all complaints and filters by date,
+  category, status and user type.
+- `GET /api/v1/admin/complaints/{id}` returns permitted details and evidence
+  references.
+- `PATCH /api/v1/admin/complaints/{id}/status` applies valid transitions and
+  required comments, observations or conclusions.
+- `GET /api/v1/admin/complaints/export.xlsx` downloads complete or filtered
+  complaints with specified columns and evidence links.
+- `POST /api/v1/admin/reports/word/draft` creates an editable seven-section
+  draft from selected complaints or a category.
+- `PATCH /api/v1/admin/reports/word/draft/{id}` saves administrator edits.
+- `GET /api/v1/admin/reports/word/draft/{id}/download` downloads the edited
+  Word document.
+
+## Dashboard and monthly follow-up
+
+- `GET /api/v1/admin/dashboard` returns stored totals, category/status counts,
+  weekly/monthly charts, proportions, leading categories and monthly work.
+- The response separates real data from labeled AI estimates and reports when
+  the five-complaint minimum is not met.
+- `GET /api/v1/admin/follow-up/months` returns completion, reopening and
+  re-completion groupings.
+
+## Telegram administration
+
+- `POST /api/v1/admin/telegram/link-challenge` creates the 10-minute
+  single-use linking challenge.
+- `POST /api/v1/admin/telegram/link` completes or replaces the sole link.
+- `DELETE /api/v1/admin/telegram/link` unlinks the current account.
+- `PATCH /api/v1/admin/telegram/notifications` enables or disables new
+  complaint notices.
+- `POST /api/v1/telegram/webhook` accepts only requests with the configured
+  webhook secret and routes allowed commands for the linked account.
+- Allowed commands are `Ayuda`, `Resumen`, `Pendientes` and `Mes`; all are
+  read-only. Unknown or unauthorized requests receive no complaint data.
+
