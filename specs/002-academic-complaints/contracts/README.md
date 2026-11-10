@@ -61,3 +61,21 @@ directly.
 - Allowed commands are `Ayuda`, `Resumen`, `Pendientes` and `Mes`; all are
   read-only. Unknown or unauthorized requests receive no complaint data.
 
+## Error behavior
+
+Errors are clear Spanish messages without traces, routes, credentials, codes or
+internal details. The API uses `400` invalid input, `401` unauthenticated,
+`403` forbidden, `404` missing resource, `409` invalid state, `429` rate limit
+or lockout and `500` generic error. Telegram delivery failure never changes a
+successful public complaint response into an error.
+
+## Integration boundaries
+
+- Google Drive stores sanitized evidence and is administrator-only.
+- AI receives no names, semesters or images and returns advisory proposals or
+  labeled estimates.
+- Telegram receives only permitted summaries, identifiers and challenge
+  delivery; it never receives complaint content, identity, evidence,
+  passwords or security answers.
+- Export and integration failures are observable and reported without silent
+  complaint loss.
