@@ -1,0 +1,27 @@
+# Java / Maven
+backend/target/
+*.class
+*.jar
+
+# Node.js
+node_modules/
+frontend/dist/
+frontend/build/
+frontend/coverage/
+*.log
+/package-lock.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
