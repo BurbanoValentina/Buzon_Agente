@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: academic-complaints
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:mem:complaints;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
+    username: ${DATABASE_USERNAME:sa}
+    password: ${DATABASE_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 500MB
+server:
+  port: ${PORT:8081}
+  servlet:
+    session:
+      timeout: 10h
+springdoc:
+  api-docs:
+    path: /api/v1/openapi
+  swagger-ui:
+    path: /api/v1/swagger-ui
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+telegram:
+  enabled: ${TELEGRAM_ENABLED:false}
+  long-polling: ${TELEGRAM_LONG_POLLING:false}
+  bot-token: ${TELEGRAM_BOT_TOKEN:}
+  webhook-secret: ${TELEGRAM_WEBHOOK_SECRET:}
+  encryption-secret: ${TELEGRAM_ENCRYPTION_SECRET:}
