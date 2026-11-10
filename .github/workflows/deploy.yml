@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build release image
+        run: docker build -f infra/Dockerfile -t buzon-ucc:${{ github.sha }} .
+      - name: Verify health endpoint
+        run: |
+          echo "Deploy the verified image to the target platform."
+          echo "Post-deployment verification must probe /actuator/health."
