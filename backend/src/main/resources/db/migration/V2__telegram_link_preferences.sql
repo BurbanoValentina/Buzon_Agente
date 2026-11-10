@@ -1,0 +1,2 @@
+ALTER TABLE telegram_link ADD COLUMN notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE telegram_link ADD COLUMN unlinked_at TIMESTAMP WITH TIME ZONE;
