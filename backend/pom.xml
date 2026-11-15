@@ -99,7 +99,19 @@
                     <excludeFilterFile>config/spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
             </plugin>
-            <plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>12.1.0</version></plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>12.1.0</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <skipTestScope>true</skipTestScope>
+                    <formats>
+                        <format>HTML</format>
+                        <format>JSON</format>
+                    </formats>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

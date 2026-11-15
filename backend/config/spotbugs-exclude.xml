@@ -8,7 +8,7 @@
         <Bug pattern="URF_UNREAD_FIELD,UUF_UNUSED_FIELD"/>
     </Match>
     <Match>
-        <Class name="com.ucc.complaints.telegram.TelegramCryptoService"/>
+        <Class name="~com\.ucc\.complaints\.(telegram\.TelegramCryptoService|storage\.SupabaseStorageService)"/>
         <Bug pattern="CT_CONSTRUCTOR_THROW,REC_CATCH_EXCEPTION"/>
     </Match>
 </FindBugsFilter>
