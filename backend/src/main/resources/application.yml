@@ -4,9 +4,10 @@ spring:
   config:
     import: optional:file:.env[.properties],optional:file:../.env[.properties]
   datasource:
-    url: ${DATABASE_URL:jdbc:h2:mem:complaints;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}
-    username: ${DATABASE_USERNAME:sa}
-    password: ${DATABASE_PASSWORD:}
+    url: ${DB_URL:${DATABASE_URL:jdbc:h2:mem:complaints;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH}}
+    username: ${DB_USERNAME:${DATABASE_USERNAME:sa}}
+    password: ${DB_PASSWORD:${DATABASE_PASSWORD:}}
+    driver-class-name: ${DB_DRIVER:${DATABASE_DRIVER:}}
   jpa:
     open-in-view: false
     hibernate:
