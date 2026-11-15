@@ -1,0 +1,39 @@
+# Render Blueprint for Buzón UCC Spring Boot Backend
+services:
+  - type: web
+    name: buzon-ucc-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: oregon # or ohio / frankfurt
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: PORT
+        value: 8081
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: TELEGRAM_ENABLED
+        value: "true"
+      - key: TELEGRAM_LONG_POLLING
+        value: "true"
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+      - key: TELEGRAM_ENCRYPTION_SECRET
+        sync: false
+      - key: AI_PROVIDER
+        value: simulation

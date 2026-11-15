@@ -33,4 +33,9 @@ public class PublicComplaintController {
         notificationService.notifyNewComplaint(response.complaintId(), request.category());
         return response;
     }
+
+    @GetMapping("/complaints/{publicId}/status")
+    public PublicComplaintStatusResponse getStatus(@PathVariable("publicId") String publicId) {
+        return service.getStatus(publicId);
+    }
 }

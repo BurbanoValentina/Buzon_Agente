@@ -19,11 +19,19 @@ de arquitectura, módulos, seguridad, datos y operación está en el
 
 - Formulario público con 11 categorías, modalidad anónima o identificada y
   validaciones de asunto, descripción y número de ubicación.
-- Evidencias JPG/JPEG/PNG sanitizadas, hasta cinco imágenes de 100 MB cada una.
-- Panel administrativo con filtros, detalle, enlaces de evidencia y exportación
-  Excel.
+- **Seguimiento público de radicado en tiempo real**: Los estudiantes consultan
+  el estado (`Pendiente`, `Completada`, `No completada`) y la línea de tiempo
+  oficial de hitos y observaciones con su código único UUID.
+- **Almacenamiento en la nube en Supabase Storage (24/7)**: Evidencias fotográficas
+  JPG/PNG sanitizadas de metadatos (EXIF) y guardadas en el bucket `evidencias`.
+- **Base de datos PostgreSQL 17.11 en Supabase (24/7)**: Persistencia en la nube
+  con migraciones automáticas versionadas Flyway.
+- Panel administrativo con filtros, detalle, enlaces a evidencia en la nube y
+  exportación Excel con auditoría.
 - Estados `Pendiente`, `Completada` y `No completada`, historial inmutable y
-  seguimiento mensual.
+  seguimiento mensual optimizado contra problemas de inicialización JPA (`@EntityGraph`).
+- Interfaz moderna mobile-first con protección contra desbordamiento de texto
+  (`overflow-wrap: anywhere; word-break: break-word`) y formularios compactos.
 - Dashboard con estadísticas semanales/mensuales y predicciones claramente
   separadas de los datos reales.
 - Reportes Word editables con siete secciones.
@@ -32,12 +40,14 @@ de arquitectura, módulos, seguridad, datos y operación está en el
 
 ## Arquitectura resumida
 
+![Arquitectura de Despliegue en la Nube](docs/images/arquitectura-nube.png)
+
 ```mermaid
 flowchart LR
     Usuario[Estudiante o administrador] --> Frontend[React + Vite]
     Frontend --> Backend[Spring Boot REST /api/v1]
-    Backend --> PostgreSQL[(PostgreSQL + Flyway)]
-    Backend --> Drive[Google Drive: evidencia sanitizada]
+    Backend --> SupabaseDB[(Supabase PostgreSQL 17.11)]
+    Backend --> SupabaseStorage[Supabase Storage: evidencias]
     Backend --> IA[IA: proveedor de simulación]
     Backend --> Telegram[Telegram: OTP y consultas de lectura]
 ```
