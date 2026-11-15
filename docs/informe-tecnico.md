@@ -24,16 +24,17 @@ generar información útil para seguimiento y toma de decisiones humanas.
 ### Alcance entregado
 
 - Registro anónimo o identificado sin cuentas de estudiante.
-- Once categorías, validación de campos y evidencia JPG/JPEG/PNG.
-- Hasta cinco imágenes de 100 MB por imagen, con sanitización de metadatos.
+- Consulta pública y seguimiento de radicado en tiempo real por código UUID con línea de tiempo de resoluciones.
+- Once categorías, validación de campos y evidencia fotográfica JPG/JPEG/PNG.
+- Hasta cinco imágenes de 100 MB por imagen, con sanitización de metadatos y almacenamiento en Supabase Storage (bucket `evidencias`).
+- Base de datos relacional PostgreSQL 17.11 en Supabase disponible 24/7 con migraciones Flyway.
 - Consulta, filtros, detalle y exportación Excel para el administrador.
-- Estados `Pendiente`, `Completada` y `No completada`, con historial y
-  seguimiento mensual.
-- Dashboard semanal/mensual con datos reales y predicciones etiquetadas como
-  estimaciones cuando se alcanza el mínimo definido.
-- Reportes Word con siete secciones, edición previa y evidencia local.
+- Estados `Pendiente`, `Completada` y `No completada`, con historial inmutable, transiciones contextuales y seguimiento mensual optimizado con `@EntityGraph`.
+- Dashboard semanal/mensual con datos reales y predicciones etiquetadas como estimaciones cuando se alcanza el mínimo definido.
+- Reportes Word con siete secciones, edición previa y evidencia.
 - Cuenta administrativa única, sesión, recuperación, lockout y auditoría.
 - Telegram con vinculación, OTP, avisos mínimos y comandos de solo lectura.
+- Interfaz adaptativa mobile-first con protección contra desbordamiento de texto (`overflow-wrap: anywhere`) y formularios compactos.
 - Health checks, observabilidad, Docker, Compose y flujos de CI/CD.
 
 ## 3. Arquitectura de la solución
@@ -44,9 +45,9 @@ flowchart LR
     A[Administrador] --> FE
     FE --> API[API REST /api/v1]
     API --> S[Servicios de dominio]
-    S --> DB[(PostgreSQL)]
-    S --> FD[Flyway]
-    S --> GD[Google Drive<br/>evidencia sanitizada]
+    S --> DB[(Supabase PostgreSQL 17.11 24/7)]
+    S --> FD[Flyway Migrations]
+    S --> ST[Supabase Storage<br/>evidencias sanitizadas]
     S --> AI[Proveedor IA<br/>simulación intercambiable]
     S --> TG[Telegram<br/>OTP y solo lectura]
     API --> OBS[Actuator y observabilidad]

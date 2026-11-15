@@ -26,11 +26,13 @@
 
 - [x] Cada requisito funcional tiene escenarios o criterios de validación relacionados.
 - [x] Las historias cubren el registro, gestión, reportes, dashboard, seguimiento y acceso.
+- [x] Las historias cubren el seguimiento público de radicado en tiempo real (User Story 8).
+- [x] Las historias cubren la persistencia 24/7 y almacenamiento en la nube en Supabase (User Story 9).
 - [x] Los criterios de éxito cubren los resultados definidos.
-- [x] No se agregaron requisitos fuera del texto adjunto.
+- [x] La interfaz cuenta con protección contra desbordamientos tipográficos y diseño responsive en expedientes y formularios.
 
 ## Notes
 
-La constitución v2.1.0 autoriza identidad opcional, evidencias, Google Drive,
-exportaciones, predicciones, Telegram y administrador único. Los secretos
-iniciales no se incluyen en esta especificación.
+La especificación incluye identidad opcional, evidencias fotográficas en Supabase Storage,
+persistencia PostgreSQL 24/7 en Supabase, exportaciones Excel, predicciones, Telegram,
+seguimiento público de radicado por UUID y administrador único con trazabilidad inmutable.

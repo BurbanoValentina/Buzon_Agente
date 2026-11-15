@@ -245,6 +245,62 @@ un aviso permitido, ejecuta comandos de solo lectura y reemplaza la cuenta.
    el envío, **Then** la queja se registra y el estudiante no ve el fallo del
    aviso.
 
+---
+
+### User Story 8 - Consulta pública de radicado y seguimiento en tiempo real (Priority: P1)
+
+Como estudiante, quiero ingresar mi código único de radicado recibido al radicar
+mi queja para conocer su estado actual, fechas y resoluciones oficiales sin
+necesidad de crear cuenta ni iniciar sesión.
+
+**Why this priority**: Brinda transparencia y tranquilidad a los estudiantes,
+permitiéndoles saber si su caso está pendiente, resuelto o si requiere seguimiento.
+
+**Independent Test**: Un estudiante ingresa su UUID de radicado en la sección
+pública "Consultar Radicado" y obtiene de inmediato la tarjeta resumen con el estado
+y la cronología de hitos oficiales.
+
+**Acceptance Scenarios**:
+
+1. **Given** la pantalla principal, **When** el usuario selecciona la pestaña
+   "Consultar Radicado", **Then** se muestra el formulario de búsqueda de radicado
+   en formato compacto sin espacios en blanco excesivos.
+2. **Given** un código de radicado válido, **When** el estudiante consulta, **Then**
+   se visualiza el estado (`Pendiente`, `Completada`, `No completada`), fecha de
+   registro, fecha de cumplimiento (si aplica) y la línea de tiempo oficial con
+   cada observación dejada por la administración.
+3. **Given** textos extensos o secuencias de caracteres sin espacios, **When**
+   se renderiza la información o las observaciones, **Then** el contenido se ajusta
+   sin desbordar los límites de la tarjeta ni de la pantalla.
+4. **Given** un código inexistente o vacío, **When** se consulta, **Then** el
+   sistema notifica con un mensaje claro de error.
+
+---
+
+### User Story 9 - Persistencia 24/7 en Supabase y almacenamiento de evidencias (Priority: P1)
+
+Como administrador y estudiante, quiero que el sistema conserve los datos en una
+base de datos en la nube accesible 24/7 y almacene las evidencias fotográficas en
+un servicio en la nube seguro, para no perder información y acceder desde cualquier lugar.
+
+**Why this priority**: Asegura la disponibilidad continua de la plataforma y
+elimina la dependencia de instancias locales de base de datos o almacenamiento.
+
+**Independent Test**: Radicar una queja con imágenes JPG/PNG, verificar que los
+datos se registran en Supabase PostgreSQL 17.11 y que los archivos se almacenan en
+el bucket `evidencias` de Supabase Storage con acceso directo para el administrador.
+
+**Acceptance Scenarios**:
+
+1. **Given** una queja radicada con imágenes adjuntas, **When** se procesa la solicitud,
+   **Then** los metadatos EXIF se eliminan y los archivos se suben al bucket público
+   `evidencias` en Supabase Storage bajo `evidencias/{radicado}/{archivo}`.
+2. **Given** el panel de expediente del administrador, **When** se consulta una queja con
+   evidencias, **Then** se muestran enlaces directos a las imágenes almacenadas en Supabase.
+3. **Given** la consulta de seguimiento mensual inmutable, **When** se solicitan los
+   eventos del período, **Then** se cargan con `@EntityGraph` sin errores de inicialización
+   perezosa de JPA/Hibernate.
+
 ### Edge Cases
 
 - Se rechaza una evidencia que no sea JPG/JPEG o PNG, supere 100 MB o exceda
@@ -391,6 +447,27 @@ un aviso permitido, ejecuta comandos de solo lectura y reemplaza la cuenta.
   ni imágenes, y ningún dato de Telegram MUST asociarse con una queja.
 - **FR-056**: El sistema MUST auditar vinculación, desvinculación, cambios de
   avisos y envío o validación de códigos sin almacenar los códigos.
+- **FR-057**: El sistema MUST permitir a cualquier estudiante consultar el
+  estado de su queja mediante su código de radicado único (UUID) en tiempo real,
+  mostrando su estado actual, fecha de registro, fecha de cumplimiento si aplica,
+  asunto reportado y la línea de tiempo oficial de resoluciones sin exponer datos
+  de otros estudiantes.
+- **FR-058**: La evidencia fotográfica MUST almacenarse en Supabase Storage
+  (bucket `evidencias`) 24/7 de forma persistente tras la sanitización de
+  metadatos (EXIF/GPS), generando enlaces de visualización pública vinculados al
+  expediente del caso.
+- **FR-059**: La base de datos relacional MUST operar sobre Supabase PostgreSQL
+  17.11 con alta disponibilidad 24/7, gestionada con migraciones automáticas
+  Flyway con soporte de línea base (`baseline-on-migrate`).
+- **FR-060**: Las vistas de expediente administrativo y seguimiento público MUST
+  implementar diseño adaptable a pantallas móviles con protección contra
+  desbordamiento de texto (`overflow-wrap: anywhere; word-break: break-word;
+  min-width: 0`) y transiciones de estado guiadas que impidan operaciones
+  inválidas.
+- **FR-061**: Las consultas de seguimiento mensual inmutable MUST implementar
+  carga optimizada con `@EntityGraph` y transaccionalidad de solo lectura para
+  prevenir fallos de inicialización de proxies JPA (`LazyInitializationException`)
+  bajo configuración de alto rendimiento `open-in-view: false`.
 
 ### Key Entities
 
