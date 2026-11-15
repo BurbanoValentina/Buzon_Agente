@@ -1,11 +1,13 @@
 package com.ucc.complaints.storage;
 
+import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import javax.imageio.ImageIO;
 
+@Component
 public class ImageMetadataSanitizer {
     public byte[] sanitize(InputStream input) throws IOException {
         BufferedImage image = ImageIO.read(input);

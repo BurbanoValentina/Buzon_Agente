@@ -19,6 +19,19 @@ public class Evidence {
     @Column(name = "drive_file_id", nullable = false)
     private String driveFileId;
     public Evidence() { }
+
+    public Evidence(Complaint complaint, String fileName, String mimeType, long sizeBytes, String driveFileId) {
+        this.complaint = complaint;
+        this.fileName = fileName;
+        this.mimeType = mimeType;
+        this.sizeBytes = sizeBytes;
+        this.driveFileId = driveFileId;
+    }
+
+    public Long getId() { return id; }
+    public Complaint getComplaint() { return complaint; }
     public String getDriveFileId() { return driveFileId; }
     public String getFileName() { return fileName; }
+    public String getMimeType() { return mimeType; }
+    public long getSizeBytes() { return sizeBytes; }
 }

@@ -2,8 +2,10 @@ package com.ucc.complaints.service;
 
 import com.ucc.complaints.dto.publiccomplaint.PublicComplaintRequest;
 import com.ucc.complaints.dto.publiccomplaint.PublicComplaintResponse;
+import com.ucc.complaints.dto.publiccomplaint.PublicComplaintStatusResponse;
 import com.ucc.complaints.model.Complaint;
 import com.ucc.complaints.repository.ComplaintRepository;
+import com.ucc.complaints.repository.StatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,12 +26,14 @@ import static org.mockito.Mockito.*;
 class ComplaintServiceTest {
     @Mock
     private ComplaintRepository repository;
+    @Mock
+    private StatusHistoryRepository statusHistories;
 
     private ComplaintService service;
 
     @BeforeEach
     void setUp() {
-        service = new ComplaintService(repository);
+        service = new ComplaintService(repository, statusHistories);
     }
 
     @Test
@@ -151,5 +157,33 @@ class ComplaintServiceTest {
             new MockMultipartFile("f6", "6.png", "image/png", new byte[]{1})
         );
         assertThrows(ComplaintValidationException.class, () -> service.create(request, files));
+    }
+
+    @Test
+    void getStatusReturnsDetailsForValidPublicId() {
+        String id = "test-uuid-1234";
+        Complaint complaint = new Complaint(id, true, "Infraestructura", "Falla de luces", "Descripcion detallada suficiente", OffsetDateTime.now());
+        when(repository.findByPublicId(id)).thenReturn(Optional.of(complaint));
+        when(statusHistories.findByComplaintIdOrderByChangedAtAsc(complaint.getId())).thenReturn(List.of());
+
+        PublicComplaintStatusResponse status = service.getStatus(id);
+
+        assertNotNull(status);
+        assertEquals(id, status.publicId());
+        assertEquals("Infraestructura", status.category());
+        assertEquals("PENDIENTE", status.status());
+        assertEquals("Falla de luces", status.subject());
+    }
+
+    @Test
+    void getStatusThrowsForNonExistentPublicId() {
+        when(repository.findByPublicId("unknown-id")).thenReturn(Optional.empty());
+
+        assertThrows(ComplaintValidationException.class, () -> service.getStatus("unknown-id"));
+    }
+
+    @Test
+    void getStatusThrowsForBlankPublicId() {
+        assertThrows(ComplaintValidationException.class, () -> service.getStatus("   "));
     }
 }

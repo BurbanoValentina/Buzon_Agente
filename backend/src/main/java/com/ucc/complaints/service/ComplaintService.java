@@ -2,7 +2,12 @@ package com.ucc.complaints.service;
 
 import com.ucc.complaints.dto.publiccomplaint.*;
 import com.ucc.complaints.model.Complaint;
+import com.ucc.complaints.model.Evidence;
 import com.ucc.complaints.repository.ComplaintRepository;
+import com.ucc.complaints.repository.EvidenceRepository;
+import com.ucc.complaints.repository.StatusHistoryRepository;
+import com.ucc.complaints.storage.SupabaseStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.OffsetDateTime;
@@ -12,9 +17,27 @@ import java.util.*;
 public class ComplaintService {
     private static final long MAX_FILE_BYTES = 100L * 1024 * 1024;
     private final ComplaintRepository repository;
+    private final StatusHistoryRepository statusHistories;
+    private final EvidenceRepository evidenceRepository;
+    private final SupabaseStorageService storageService;
 
     public ComplaintService(ComplaintRepository repository) {
+        this(repository, null, null, null);
+    }
+
+    public ComplaintService(ComplaintRepository repository, StatusHistoryRepository statusHistories) {
+        this(repository, statusHistories, null, null);
+    }
+
+    @Autowired
+    public ComplaintService(ComplaintRepository repository,
+                            StatusHistoryRepository statusHistories,
+                            EvidenceRepository evidenceRepository,
+                            SupabaseStorageService storageService) {
         this.repository = repository;
+        this.statusHistories = statusHistories;
+        this.evidenceRepository = evidenceRepository;
+        this.storageService = storageService;
     }
 
     public static ComplaintService forValidationOnly() {
@@ -47,6 +70,19 @@ public class ComplaintService {
             complaint.setSemester(request.semester().trim());
         }
         repository.save(complaint);
+
+        if (files != null && !files.isEmpty() && storageService != null && evidenceRepository != null) {
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    String publicUrl = storageService.uploadEvidence(id, file);
+                    if (publicUrl != null) {
+                        evidenceRepository.save(new Evidence(complaint, file.getOriginalFilename(),
+                            file.getContentType(), file.getSize(), publicUrl));
+                    }
+                }
+            }
+        }
+
         return new PublicComplaintResponse(id, "Pendiente", "La queja fue recibida correctamente.");
     }
 
@@ -83,6 +119,34 @@ public class ComplaintService {
             }
             files.forEach(file -> validateEvidence(file.getContentType(), 1, file.getSize()));
         }
+    }
+
+    public PublicComplaintStatusResponse getStatus(String publicId) {
+        if (publicId == null || publicId.isBlank()) {
+            throw new ComplaintValidationException("El código de radicado es obligatorio.");
+        }
+        Complaint complaint = repository.findByPublicId(publicId.trim())
+            .orElseThrow(() -> new ComplaintValidationException("No se encontró ninguna queja con el radicado proporcionado."));
+
+        List<PublicStatusHistoryItem> historyItems = statusHistories == null ? List.of() :
+            statusHistories.findByComplaintIdOrderByChangedAtAsc(complaint.getId())
+                .stream()
+                .map(h -> new PublicStatusHistoryItem(
+                    h.getPreviousStatus(),
+                    h.getNewStatus(),
+                    h.getComment(),
+                    h.getChangedAt()))
+                .toList();
+
+        return new PublicComplaintStatusResponse(
+            complaint.getPublicId(),
+            complaint.getCategory(),
+            complaint.getStatus().name(),
+            complaint.getSubject(),
+            complaint.getRegisteredAt(),
+            complaint.getCompletedAt(),
+            historyItems
+        );
     }
 
     private boolean blank(String value) {
