@@ -1,10 +1,11 @@
-const API_BASE_URL = '/api/v1';
+const RAW_API_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
+const API_BASE_URL = RAW_API_URL.replace(/\/+$/, '') + '/api/v1';
 
 export async function apiClient(path, options = {}) {
   const headers = { ...options.headers };
   if (!(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: 'same-origin',
+    credentials: RAW_API_URL ? 'include' : 'same-origin',
     headers,
     ...options
   });

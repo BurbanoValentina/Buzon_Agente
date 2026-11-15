@@ -10,3 +10,8 @@ export function submitComplaint(values, files = []) {
   files.forEach((file) => form.append('evidence', file));
   return apiClient('/public/complaints', { method: 'POST', body: form, headers: {} });
 }
+
+export function getComplaintStatus(publicId) {
+  return apiClient(`/public/complaints/${encodeURIComponent(publicId.trim())}/status`);
+}
+

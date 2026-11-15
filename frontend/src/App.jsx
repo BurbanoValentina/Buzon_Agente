@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Icon } from './components/Icon';
 import { getAdminSession, logout } from './services/adminAuthApi';
 import { PublicComplaintForm } from './features/complaints/PublicComplaintForm';
+import { PublicComplaintTracker } from './features/complaints/PublicComplaintTracker';
 import { AdminAccessLogo } from './features/admin/account/AdminAccessLogo';
 import { AdminLogin } from './features/admin/account/AdminLogin';
 import { AdminComplaintsPage } from './features/admin/complaints/AdminComplaintsPage';
@@ -22,6 +23,8 @@ const ADMIN_TABS = [
 
 export function App() {
   const [view, setView] = useState('public'); // 'public', 'login', 'admin'
+  const [publicTab, setPublicTab] = useState('register'); // 'register', 'track'
+  const [trackingRadicado, setTrackingRadicado] = useState('');
   const [adminTab, setAdminTab] = useState('complaints');
   const [adminUser, setAdminUser] = useState(null);
   const [sessionMessage, setSessionMessage] = useState('');
@@ -190,19 +193,66 @@ export function App() {
               </article>
             </section>
 
-            {/* Formulario Público */}
-            <section className="content-card">
-              <div className="card-header-styled">
-                <h3 className="card-title-styled">
-                  <span className="card-title-icon">
-                    <Icon name="edit_note" size={21} />
-                  </span>
-                  <span>Registro de Queja Académica</span>
-                </h3>
-                <span className="char-counter-pill">Los campos con (*) son obligatorios</span>
-              </div>
-              <PublicComplaintForm />
-            </section>
+            {/* Selector de Navegación Pública: Radicar vs Consultar Radicado */}
+            <div
+              className="admin-nav"
+              style={{
+                maxWidth: '460px',
+                margin: '0 auto 1.5rem',
+                justifyContent: 'center',
+                background: 'rgba(255, 255, 255, 0.92)'
+              }}
+              role="tablist"
+              aria-label="Opciones del canal estudiantil"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={publicTab === 'register'}
+                className={`admin-nav-btn ${publicTab === 'register' ? 'active' : ''}`}
+                onClick={() => setPublicTab('register')}
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                <Icon name="edit_note" size={19} />
+                <span>Radicar Queja</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={publicTab === 'track'}
+                className={`admin-nav-btn ${publicTab === 'track' ? 'active' : ''}`}
+                onClick={() => setPublicTab('track')}
+                style={{ flex: 1, justifyContent: 'center' }}
+              >
+                <Icon name="track_changes" size={19} />
+                <span>Consultar Radicado</span>
+              </button>
+            </div>
+
+            {publicTab === 'register' ? (
+              <section className="content-card">
+                <div className="card-header-styled">
+                  <h3 className="card-title-styled">
+                    <span className="card-title-icon">
+                      <Icon name="edit_note" size={21} />
+                    </span>
+                    <span>Registro de Queja Académica</span>
+                  </h3>
+                  <span className="char-counter-pill">Los campos con (*) son obligatorios</span>
+                </div>
+                <PublicComplaintForm
+                  onTrackComplaint={(id) => {
+                    setTrackingRadicado(id);
+                    setPublicTab('track');
+                  }}
+                />
+              </section>
+            ) : (
+              <PublicComplaintTracker
+                initialRadicado={trackingRadicado}
+                onNewComplaint={() => setPublicTab('register')}
+              />
+            )}
           </div>
         )}
 

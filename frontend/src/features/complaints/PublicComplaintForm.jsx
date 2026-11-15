@@ -30,7 +30,7 @@ const CATEGORY_ICONS = {
   'Otras situaciones': 'more_horiz'
 };
 
-export function PublicComplaintForm({ onSubmitted = () => {} }) {
+export function PublicComplaintForm({ onSubmitted = () => {}, onTrackComplaint }) {
   const [values, setValues] = useState(initialValues);
   const [files, setFiles] = useState([]);
   const [errors, setErrors] = useState({});
@@ -367,14 +367,27 @@ export function PublicComplaintForm({ onSubmitted = () => {} }) {
                   {status.receipt.complaintId}
                 </strong>
               </div>
-              <button
-                type="button"
-                className="btn-secondary btn-sm"
-                onClick={() => copyComplaintId(status.receipt.complaintId)}
-              >
-                <Icon name={copiedId ? 'check' : 'content_copy'} size={15} />
-                <span>{copiedId ? 'Copiado' : 'Copiar ID'}</span>
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className="btn-secondary btn-sm"
+                  onClick={() => copyComplaintId(status.receipt.complaintId)}
+                >
+                  <Icon name={copiedId ? 'check' : 'content_copy'} size={15} />
+                  <span>{copiedId ? 'Copiado' : 'Copiar ID'}</span>
+                </button>
+                {onTrackComplaint && (
+                  <button
+                    type="button"
+                    className="btn-primary btn-sm"
+                    onClick={() => onTrackComplaint(status.receipt.complaintId)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                  >
+                    <Icon name="track_changes" size={15} />
+                    <span>Ver estado de mi queja</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
