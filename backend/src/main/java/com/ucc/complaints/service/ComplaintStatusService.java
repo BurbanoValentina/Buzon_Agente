@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ComplaintStatusService {
     private final ComplaintRepository complaints;
     private final StatusHistoryRepository histories;

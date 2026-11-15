@@ -4,10 +4,12 @@ import com.ucc.complaints.dto.admin.*;
 import com.ucc.complaints.model.Complaint;
 import com.ucc.complaints.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class ComplaintQueryService {
     private final ComplaintRepository complaints;
     private final EvidenceRepository evidence;

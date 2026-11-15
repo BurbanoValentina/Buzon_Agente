@@ -15,7 +15,10 @@ export function StatusHistory({ history = [] }) {
         padding: '1.15rem',
         borderRadius: 'var(--radius-md)',
         border: '1px solid var(--border-subtle)',
-        marginTop: '1rem'
+        marginTop: '1rem',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        overflow: 'hidden'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.5rem' }}>
@@ -28,9 +31,9 @@ export function StatusHistory({ history = [] }) {
           Sin cambios de estado registrados todavía. Esta queja permanece en estado inicial Pendiente.
         </p>
       ) : (
-        <ol className="timeline-list">
+        <ol className="timeline-list" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
           {history.map((item, index) => (
-            <li key={`${item.changedAt}-${index}`} className="timeline-item">
+            <li key={`${item.changedAt}-${index}`} className="timeline-item" style={{ maxWidth: '100%', boxSizing: 'border-box' }}>
               <span className="timeline-dot" aria-hidden="true" />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--navy-900)' }}>
@@ -46,11 +49,11 @@ export function StatusHistory({ history = [] }) {
                   {item.changedAt ? new Date(item.changedAt).toLocaleString() : ''}
                 </span>
               </div>
-              <p style={{ margin: '0.28rem 0 0', fontSize: '0.82rem', color: 'var(--slate-700)', lineHeight: 1.45 }}>
+              <p style={{ margin: '0.28rem 0 0', fontSize: '0.82rem', color: 'var(--slate-700)', lineHeight: 1.45, overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
                 {item.comment}
               </p>
               {item.changedBy && (
-                <span style={{ fontSize: '0.72rem', color: 'var(--slate-400)' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--slate-400)', display: 'block', marginTop: '0.2rem' }}>
                   Gestionado por: {item.changedBy}
                 </span>
               )}

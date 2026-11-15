@@ -81,17 +81,21 @@ export function ComplaintDetail({ complaint, history = [], onStatusUpdated, onCl
 
       <div className="expediente-split">
         {/* Columna izquierda: información y evidencias */}
-        <div>
+        <div style={{ minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' }}>
           <div className="meta-grid">
             <div className="meta-tile">
               <span className="meta-label">Categoría</span>
-              <strong style={{ color: 'var(--navy-900)' }}>{complaint.category}</strong>
+              <strong style={{ color: 'var(--navy-900)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                {complaint.category}
+              </strong>
             </div>
 
             {complaint.locationNumber && (
               <div className="meta-tile">
                 <span className="meta-label">Ubicación / Número</span>
-                <strong style={{ color: 'var(--navy-900)' }}>{complaint.locationNumber}</strong>
+                <strong style={{ color: 'var(--navy-900)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                  {complaint.locationNumber}
+                </strong>
               </div>
             )}
 
@@ -115,11 +119,15 @@ export function ComplaintDetail({ complaint, history = [], onStatusUpdated, onCl
               <>
                 <div className="meta-tile highlight">
                   <span className="meta-label" style={{ color: 'var(--primary-hover)' }}>Estudiante</span>
-                  <strong style={{ color: 'var(--navy-900)' }}>{complaint.name}</strong>
+                  <strong style={{ color: 'var(--navy-900)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                    {complaint.name}
+                  </strong>
                 </div>
                 <div className="meta-tile highlight">
                   <span className="meta-label" style={{ color: 'var(--primary-hover)' }}>Semestre</span>
-                  <strong style={{ color: 'var(--navy-900)' }}>{complaint.semester}</strong>
+                  <strong style={{ color: 'var(--navy-900)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                    {complaint.semester}
+                  </strong>
                 </div>
               </>
             )}
@@ -127,7 +135,9 @@ export function ComplaintDetail({ complaint, history = [], onStatusUpdated, onCl
 
           <div className="meta-tile" style={{ marginBottom: '1rem' }}>
             <span className="meta-label">Asunto</span>
-            <strong style={{ fontSize: '1rem', color: 'var(--navy-900)' }}>{complaint.subject}</strong>
+            <strong style={{ fontSize: '1rem', color: 'var(--navy-900)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+              {complaint.subject}
+            </strong>
           </div>
 
           <div style={{ marginBottom: '1.15rem' }}>
@@ -143,7 +153,11 @@ export function ComplaintDetail({ complaint, history = [], onStatusUpdated, onCl
                 border: '1px solid var(--border-subtle)',
                 whiteSpace: 'pre-line',
                 lineHeight: 1.6,
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+                maxWidth: '100%',
+                boxSizing: 'border-box'
               }}
             >
               {complaint.description}
@@ -179,7 +193,7 @@ export function ComplaintDetail({ complaint, history = [], onStatusUpdated, onCl
         </div>
 
         {/* Columna derecha: gestión de estado + historial */}
-        <div>
+        <div style={{ minWidth: 0, maxWidth: '100%', boxSizing: 'border-box' }}>
           <StatusControls
             complaintId={complaint.id}
             currentStatus={complaint.status}

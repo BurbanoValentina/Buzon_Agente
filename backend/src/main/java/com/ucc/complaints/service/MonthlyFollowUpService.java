@@ -4,11 +4,13 @@ import com.ucc.complaints.dto.status.MonthlyFollowUpResponse;
 import com.ucc.complaints.model.MonthlyEvent;
 import com.ucc.complaints.repository.MonthlyEventRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class MonthlyFollowUpService {
     private final MonthlyEventRepository monthlyEvents;
 

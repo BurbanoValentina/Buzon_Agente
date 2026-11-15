@@ -2,23 +2,38 @@ import { useEffect, useState } from 'react';
 import { Icon } from '../../../components/Icon';
 import { updateComplaintStatus } from '../../../services/statusApi';
 
-const statuses = [
-  ['COMPLETADA', 'Completada'],
-  ['NO_COMPLETADA', 'No completada'],
-  ['PENDIENTE', 'Pendiente']
-];
+function getAvailableTransitions(current) {
+  switch (current) {
+    case 'COMPLETADA':
+      return [['PENDIENTE', 'Reabrir caso (pasa a Pendiente)']];
+    case 'NO_COMPLETADA':
+      return [
+        ['PENDIENTE', 'Reabrir caso (pasa a Pendiente)'],
+        ['COMPLETADA', 'Completar / Resolver']
+      ];
+    case 'PENDIENTE':
+    default:
+      return [
+        ['COMPLETADA', 'Completar / Resolver'],
+        ['NO_COMPLETADA', 'Marcar No completada']
+      ];
+  }
+}
 
 export function StatusControls({ complaintId, currentStatus, onUpdated }) {
-  const [status, setStatus] = useState(currentStatus || 'PENDIENTE');
+  const availableTransitions = getAvailableTransitions(currentStatus);
+  const [status, setStatus] = useState(availableTransitions[0]?.[0] || 'PENDIENTE');
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setStatus(currentStatus || 'PENDIENTE');
+    const transitions = getAvailableTransitions(currentStatus);
+    setStatus(transitions[0]?.[0] || 'PENDIENTE');
     setError('');
     setSuccess('');
+    setComment('');
   }, [complaintId, currentStatus]);
 
   async function submit(event) {
@@ -26,6 +41,10 @@ export function StatusControls({ complaintId, currentStatus, onUpdated }) {
     setSuccess('');
     if (!comment.trim()) {
       setError('El comentario de gestión es obligatorio.');
+      return;
+    }
+    if (status === currentStatus) {
+      setError('El caso ya se encuentra en este estado. Selecciona una nueva transición.');
       return;
     }
     setSaving(true);
@@ -51,7 +70,10 @@ export function StatusControls({ complaintId, currentStatus, onUpdated }) {
         padding: '1.15rem',
         borderRadius: 'var(--radius-md)',
         border: '1px solid var(--border-subtle)',
-        gap: '0.9rem'
+        gap: '0.9rem',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        overflow: 'hidden'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -63,8 +85,13 @@ export function StatusControls({ complaintId, currentStatus, onUpdated }) {
 
       <div>
         <label htmlFor="status">Nuevo estado</label>
-        <select id="status" value={status} onChange={(event) => setStatus(event.target.value)}>
-          {statuses.map(([value, label]) => (
+        <select
+          id="status"
+          value={status}
+          onChange={(event) => setStatus(event.target.value)}
+          style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
+        >
+          {availableTransitions.map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>
@@ -80,18 +107,25 @@ export function StatusControls({ complaintId, currentStatus, onUpdated }) {
           value={comment}
           onChange={(event) => setComment(event.target.value)}
           rows="3"
-          style={{ minHeight: '86px' }}
+          style={{
+            minHeight: '86px',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            overflowWrap: 'anywhere',
+            wordBreak: 'break-word'
+          }}
         />
       </div>
 
       {error && (
-        <p role="alert">
+        <p role="alert" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
           <Icon name="error" size={17} />
           <span>{error}</span>
         </p>
       )}
       {success && (
-        <p role="status">
+        <p role="status" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
           <Icon name="check_circle" filled size={17} />
           <span>{success}</span>
         </p>
