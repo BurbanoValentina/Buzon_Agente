@@ -29,5 +29,12 @@ export async function apiClient(path, options = {}) {
     error.status = response.status;
     throw error;
   }
-  return response.status === 204 ? undefined : response.json();
+  if (response.status === 204) return undefined;
+  try {
+    return await response.json();
+  } catch {
+    throw new Error(
+      'El servidor no devolvió una respuesta JSON válida. Verifica que el backend esté en ejecución y que VITE_API_URL apunte al servidor correcto.'
+    );
+  }
 }
