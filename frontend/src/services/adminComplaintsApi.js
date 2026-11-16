@@ -19,10 +19,26 @@ export function getComplaint(id) {
 
 export async function downloadComplaints(filters) {
   const query = queryString(filters);
-  const response = await fetch(`/api/v1/admin/complaints/export.xlsx${query ? `?${query}` : ''}`, {
-    credentials: 'same-origin'
+  const RAW_API_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || '';
+  const API_BASE_URL = RAW_API_URL.replace(/\/+$/, '') + '/api/v1';
+  const token =
+    typeof window !== 'undefined'
+      ? window.sessionStorage?.getItem('ucc_admin_token') || window.localStorage?.getItem('ucc_admin_token')
+      : null;
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['X-Admin-Token'] = token;
+  }
+  const response = await fetch(`${API_BASE_URL}/admin/complaints/export.xlsx${query ? `?${query}` : ''}`, {
+    credentials: RAW_API_URL ? 'include' : 'same-origin',
+    headers
   });
   if (response.status === 401 || response.status === 403) {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage?.removeItem('ucc_admin_token');
+      window.localStorage?.removeItem('ucc_admin_token');
+    }
     const message = 'Tu sesión expiró o no está autenticada. Inicia sesión nuevamente.';
     if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function' && window.CustomEvent) {
       window.dispatchEvent(new window.CustomEvent('ucc:session-expired', { detail: message }));

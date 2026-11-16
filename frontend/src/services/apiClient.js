@@ -4,12 +4,26 @@ const API_BASE_URL = RAW_API_URL.replace(/\/+$/, '') + '/api/v1';
 export async function apiClient(path, options = {}) {
   const headers = { ...options.headers };
   if (!(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
+
+  const token =
+    typeof window !== 'undefined'
+      ? window.sessionStorage?.getItem('ucc_admin_token') || window.localStorage?.getItem('ucc_admin_token')
+      : null;
+  if (token && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['X-Admin-Token'] = token;
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     credentials: RAW_API_URL ? 'include' : 'same-origin',
     headers,
     ...options
   });
   if (response.status === 401 || response.status === 403) {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage?.removeItem('ucc_admin_token');
+      window.localStorage?.removeItem('ucc_admin_token');
+    }
     const payload = await response.json().catch(() => ({}));
     const message =
       payload.message || 'Tu sesión expiró o no está autenticada. Inicia sesión nuevamente.';
