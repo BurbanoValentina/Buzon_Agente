@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,10 +17,10 @@ import java.io.IOException;
 @Component
 public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
 
-    private final AdminAuthenticationService authenticationService;
+    private final ObjectProvider<AdminAuthenticationService> authenticationServiceProvider;
 
-    public AdminSessionAuthenticationFilter(AdminAuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    public AdminSessionAuthenticationFilter(ObjectProvider<AdminAuthenticationService> authenticationServiceProvider) {
+        this.authenticationServiceProvider = authenticationServiceProvider;
     }
 
     @Override
@@ -27,34 +28,39 @@ public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String username = null;
 
+        AdminAuthenticationService authService = authenticationServiceProvider.getIfAvailable();
+
         // 1. Validar por Header Authorization: Bearer <token> o X-Admin-Token
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7).trim();
-            username = authenticationService.getUsernameForToken(token);
-        }
-        if (username == null) {
-            String customToken = request.getHeader("X-Admin-Token");
-            if (customToken != null && !customToken.isBlank()) {
-                username = authenticationService.getUsernameForToken(customToken.trim());
+        if (authService != null) {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7).trim();
+                username = authService.getUsernameForToken(token);
+            }
+            if (username == null) {
+                String customToken = request.getHeader("X-Admin-Token");
+                if (customToken != null && !customToken.isBlank()) {
+                    username = authService.getUsernameForToken(customToken.trim());
+                }
             }
         }
 
-        // 2. Fallback: validar por HttpSession / Cookie JSESSIONID
+        // 2. Validar por Session Cookie (fallback)
         if (username == null) {
             HttpSession session = request.getSession(false);
             if (session != null) {
-                Object sessionUser = session.getAttribute(AdminAuthenticationService.SESSION_USERNAME);
-                if (sessionUser instanceof String val && !val.isBlank()) {
-                    username = val;
+                Object attr = session.getAttribute(AdminAuthenticationService.SESSION_USERNAME);
+                if (attr instanceof String s && !s.isBlank()) {
+                    username = s;
                 }
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var authentication = new UsernamePasswordAuthenticationToken(
-                username, null, AuthorityUtils.createAuthorityList("ROLE_ADMIN"));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                username, null, AuthorityUtils.createAuthorityList("ROLE_ADMIN")
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         filterChain.doFilter(request, response);

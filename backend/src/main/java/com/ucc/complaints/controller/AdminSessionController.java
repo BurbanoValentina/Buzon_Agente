@@ -80,13 +80,21 @@ public class AdminSessionController {
             ));
         }
 
-        String token = authenticationService.createToken(account.getUsername());
+        String token = null;
+        if (authenticationService != null) {
+            try {
+                token = authenticationService.createToken(account.getUsername());
+            } catch (Exception ignored) {
+            }
+        }
         establishAuthenticatedSession(session, account.getUsername());
-        return ResponseEntity.ok(Map.of(
-            "username", account.getUsername(),
-            "token", token,
-            "otpRequired", false
-        ));
+        Map<String, Object> responseBody = new java.util.HashMap<>();
+        responseBody.put("username", account.getUsername());
+        responseBody.put("otpRequired", false);
+        if (token != null) {
+            responseBody.put("token", token);
+        }
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/otp/verify")
@@ -102,13 +110,21 @@ public class AdminSessionController {
         if (authenticationService.validateTelegramOtp("LOGIN", pendingKey, code)) {
             session.removeAttribute(PENDING_OTP_USER);
             session.removeAttribute(PENDING_OTP_KEY);
-            String token = authenticationService.createToken(pendingUser);
+            String token = null;
+            if (authenticationService != null) {
+                try {
+                    token = authenticationService.createToken(pendingUser);
+                } catch (Exception ignored) {
+                }
+            }
             establishAuthenticatedSession(session, pendingUser);
-            return ResponseEntity.ok(Map.of(
-                "username", pendingUser,
-                "token", token,
-                "otpRequired", false
-            ));
+            Map<String, Object> responseBody = new java.util.HashMap<>();
+            responseBody.put("username", pendingUser);
+            responseBody.put("otpRequired", false);
+            if (token != null) {
+                responseBody.put("token", token);
+            }
+            return ResponseEntity.ok(responseBody);
         }
 
         boolean fallbackRequired = challengeService != null && challengeService.requiresSecurityFallback(pendingKey);
@@ -162,13 +178,21 @@ public class AdminSessionController {
         }
         session.removeAttribute(PENDING_OTP_USER);
         session.removeAttribute(PENDING_OTP_KEY);
-        String token = authenticationService.createToken(account.getUsername());
+        String token = null;
+        if (authenticationService != null) {
+            try {
+                token = authenticationService.createToken(account.getUsername());
+            } catch (Exception ignored) {
+            }
+        }
         establishAuthenticatedSession(session, account.getUsername());
-        return ResponseEntity.ok(Map.of(
-            "username", account.getUsername(),
-            "token", token,
-            "question", AdminAuthenticationService.SECURITY_QUESTION
-        ));
+        Map<String, String> responseBody = new java.util.HashMap<>();
+        responseBody.put("username", account.getUsername());
+        responseBody.put("question", AdminAuthenticationService.SECURITY_QUESTION);
+        if (token != null) {
+            responseBody.put("token", token);
+        }
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/logout")
