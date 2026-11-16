@@ -1,4 +1,4 @@
-const RAW_API_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
+const RAW_API_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) || '';
 const API_BASE_URL = RAW_API_URL.replace(/\/+$/, '') + '/api/v1';
 
 export async function apiClient(path, options = {}) {
