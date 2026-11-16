@@ -66,6 +66,8 @@ Esta guía explica paso a paso cómo publicar el proyecto en internet para que f
 7. Espera unos 3-4 minutos a que termine de compilar. Al finalizar, Render te dará tu URL pública, por ejemplo:
    `https://buzon-ucc-backend.onrender.com`
 
+El perfil `prod` configura la cookie de sesión como `SameSite=None; Secure`, necesaria para que el navegador envíe la sesión administrativa desde el frontend de Vercel al backend de Render.
+
 ---
 
 ## 3. Despliegue del Frontend en Vercel
