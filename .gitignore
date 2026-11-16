@@ -11,6 +11,9 @@ frontend/coverage/
 *.log
 /package-lock.json
 
+# Firebase cache
+.firebase/
+
 # Environment files
 .env
 .env.*

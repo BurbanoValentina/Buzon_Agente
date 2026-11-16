@@ -33,6 +33,8 @@ public class SecurityConfig {
             "http://localhost:*",
             "http://127.0.0.1:*",
             "https://*.vercel.app",
+            "https://*.web.app",
+            "https://*.firebaseapp.com",
             "https://*.onrender.com",
             "https://*.campusucc.edu.co"
         ));
