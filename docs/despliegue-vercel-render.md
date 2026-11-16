@@ -50,8 +50,8 @@ Esta guía explica paso a paso cómo publicar el proyecto en internet para que f
    Haz clic en **Add Environment Variable** y agrega las siguientes (toma los valores de tu `.env` de Supabase y Telegram):
    * `PORT`: `8081`
    * `SPRING_PROFILES_ACTIVE`: `prod`
-   * `DATABASE_URL`: `jdbc:postgresql://db.<PROJECT-REF>.supabase.co:5432/postgres?sslmode=require`
-   * `DATABASE_USERNAME`: `postgres`
+   * `DATABASE_URL`: `jdbc:postgresql://aws-0-<REGION>.pooler.supabase.com:5432/postgres?sslmode=require` *(Usar el host del **Connection Pooler en Session Mode** en Supabase > Project Settings > Database > Connection pooler, ya que Render requiere IPv4)*
+   * `DATABASE_USERNAME`: `postgres.<PROJECT-REF>` *(En el pooler de Supabase el usuario debe ser `postgres.[PROJECT-REF]`)*
    * `DATABASE_PASSWORD`: `<TU_PASSWORD_DE_POSTGRES_SUPABASE>`
    * `SUPABASE_URL`: `https://<PROJECT-REF>.supabase.co`
    * `SUPABASE_SECRET_KEY`: `<TU_SUPABASE_SERVICE_ROLE_SECRET_KEY>`
