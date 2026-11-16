@@ -80,13 +80,7 @@ public class AdminSessionController {
             ));
         }
 
-        String token = null;
-        if (authenticationService != null) {
-            try {
-                token = authenticationService.createToken(account.getUsername());
-            } catch (Exception ignored) {
-            }
-        }
+        String token = authenticationService.createToken(account.getUsername());
         establishAuthenticatedSession(session, account.getUsername());
         Map<String, Object> responseBody = new java.util.HashMap<>();
         responseBody.put("username", account.getUsername());
@@ -110,13 +104,7 @@ public class AdminSessionController {
         if (authenticationService.validateTelegramOtp("LOGIN", pendingKey, code)) {
             session.removeAttribute(PENDING_OTP_USER);
             session.removeAttribute(PENDING_OTP_KEY);
-            String token = null;
-            if (authenticationService != null) {
-                try {
-                    token = authenticationService.createToken(pendingUser);
-                } catch (Exception ignored) {
-                }
-            }
+            String token = authenticationService.createToken(pendingUser);
             establishAuthenticatedSession(session, pendingUser);
             Map<String, Object> responseBody = new java.util.HashMap<>();
             responseBody.put("username", pendingUser);
@@ -178,13 +166,7 @@ public class AdminSessionController {
         }
         session.removeAttribute(PENDING_OTP_USER);
         session.removeAttribute(PENDING_OTP_KEY);
-        String token = null;
-        if (authenticationService != null) {
-            try {
-                token = authenticationService.createToken(account.getUsername());
-            } catch (Exception ignored) {
-            }
-        }
+        String token = authenticationService.createToken(account.getUsername());
         establishAuthenticatedSession(session, account.getUsername());
         Map<String, String> responseBody = new java.util.HashMap<>();
         responseBody.put("username", account.getUsername());

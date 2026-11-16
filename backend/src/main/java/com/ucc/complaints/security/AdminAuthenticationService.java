@@ -38,9 +38,13 @@ public class AdminAuthenticationService {
     }
 
     public String getUsernameForToken(String token) {
-        if (token == null || token.isBlank()) return null;
+        if (token == null || token.isBlank()) {
+            return null;
+        }
         AdminTokenSession tokenSession = activeTokens.get(token);
-        if (tokenSession == null) return null;
+        if (tokenSession == null) {
+            return null;
+        }
         if (tokenSession.expiresAt().isBefore(java.time.Instant.now())) {
             activeTokens.remove(token);
             return null;
