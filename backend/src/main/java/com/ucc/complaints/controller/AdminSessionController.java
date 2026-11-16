@@ -80,9 +80,11 @@ public class AdminSessionController {
             ));
         }
 
+        String token = authenticationService.createToken(account.getUsername());
         establishAuthenticatedSession(session, account.getUsername());
         return ResponseEntity.ok(Map.of(
             "username", account.getUsername(),
+            "token", token,
             "otpRequired", false
         ));
     }
@@ -100,9 +102,11 @@ public class AdminSessionController {
         if (authenticationService.validateTelegramOtp("LOGIN", pendingKey, code)) {
             session.removeAttribute(PENDING_OTP_USER);
             session.removeAttribute(PENDING_OTP_KEY);
+            String token = authenticationService.createToken(pendingUser);
             establishAuthenticatedSession(session, pendingUser);
             return ResponseEntity.ok(Map.of(
                 "username", pendingUser,
+                "token", token,
                 "otpRequired", false
             ));
         }
@@ -158,15 +162,25 @@ public class AdminSessionController {
         }
         session.removeAttribute(PENDING_OTP_USER);
         session.removeAttribute(PENDING_OTP_KEY);
+        String token = authenticationService.createToken(account.getUsername());
         establishAuthenticatedSession(session, account.getUsername());
         return ResponseEntity.ok(Map.of(
             "username", account.getUsername(),
+            "token", token,
             "question", AdminAuthenticationService.SECURITY_QUESTION
         ));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpSession session) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpSession session) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            authenticationService.invalidateToken(authHeader.substring(7).trim());
+        }
+        String customToken = request.getHeader("X-Admin-Token");
+        if (customToken != null) {
+            authenticationService.invalidateToken(customToken.trim());
+        }
         session.invalidate();
         SecurityContextHolder.clearContext();
         return ResponseEntity.noContent().build();
@@ -174,12 +188,28 @@ public class AdminSessionController {
 
     @GetMapping("/session")
     public ResponseEntity<Map<String, Object>> currentSession(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            Object username = session.getAttribute(AdminAuthenticationService.SESSION_USERNAME);
-            if (username instanceof String value && !value.isBlank()) {
-                return ResponseEntity.ok(Map.of("authenticated", true, "username", value));
+        String username = null;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            username = authenticationService.getUsernameForToken(authHeader.substring(7).trim());
+        }
+        if (username == null) {
+            String customToken = request.getHeader("X-Admin-Token");
+            if (customToken != null) {
+                username = authenticationService.getUsernameForToken(customToken.trim());
             }
+        }
+        if (username == null) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                Object val = session.getAttribute(AdminAuthenticationService.SESSION_USERNAME);
+                if (val instanceof String s && !s.isBlank()) {
+                    username = s;
+                }
+            }
+        }
+        if (username != null) {
+            return ResponseEntity.ok(Map.of("authenticated", true, "username", username));
         }
         return ResponseEntity.ok(Map.of("authenticated", false));
     }

@@ -27,6 +27,32 @@ public class AdminAuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
     private final TelegramChallengeService challengeService;
+    private final java.util.Map<String, AdminTokenSession> activeTokens = new java.util.concurrent.ConcurrentHashMap<>();
+
+    public record AdminTokenSession(String username, java.time.Instant expiresAt) {}
+
+    public String createToken(String username) {
+        String token = java.util.UUID.randomUUID().toString();
+        activeTokens.put(token, new AdminTokenSession(username, java.time.Instant.now().plus(java.time.Duration.ofHours(10))));
+        return token;
+    }
+
+    public String getUsernameForToken(String token) {
+        if (token == null || token.isBlank()) return null;
+        AdminTokenSession tokenSession = activeTokens.get(token);
+        if (tokenSession == null) return null;
+        if (tokenSession.expiresAt().isBefore(java.time.Instant.now())) {
+            activeTokens.remove(token);
+            return null;
+        }
+        return tokenSession.username();
+    }
+
+    public void invalidateToken(String token) {
+        if (token != null) {
+            activeTokens.remove(token);
+        }
+    }
 
     public AdminAuthenticationService(AdministratorAccountRepository accounts,
                                        PasswordEncoder passwordEncoder,

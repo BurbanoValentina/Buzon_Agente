@@ -25,6 +25,9 @@ server:
   servlet:
     session:
       timeout: 10h
+      cookie:
+        same-site: none
+        secure: true
 springdoc:
   api-docs:
     path: /api/v1/openapi
